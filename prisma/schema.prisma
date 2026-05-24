@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CandidateStatus {
+  SHORTLISTED
+  PENDING
+  REJECTED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  passwordHash String
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Candidate {
+  id             String          @id @default(cuid())
+  name           String
+  email          String          @unique
+  phone          String?
+  skills         String[]
+  experienceYears Int            @default(0) @map("experience_years")
+  resumeText     String          @map("resume_text")
+  aiSummary      Json?           @map("ai_summary")
+  aiScore        Int?            @map("ai_score")
+  status         CandidateStatus @default(PENDING)
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@map("candidates")
+}
